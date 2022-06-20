@@ -1,9 +1,9 @@
-## =======================================================##
-## creates an HTML interface to browse Flags and Notables ##
-## by @seb303                                             ##
-## v0.1 2022-06-20                                        ##
-## Requires Denizen-1.2.5-b6309-DEV or newer              ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
-## =======================================================##
+## ====================================================##
+## creates an HTML interface to browse Flags and Notes ##
+## by @seb303                                          ##
+## v0.1 2022-06-20                                     ##
+## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
+## ====================================================##
 
 
 ## CONFIG STARTS ##
@@ -14,6 +14,7 @@ dnbrowse_config:
     address: localhost
 
     # Port for internal webserver to listen on
+    # Note: this port number will also need changing in all the "webserver web request" events below
     port: 8080
 
     # Timeout period in seconds (after this time the internal webserver is stopped if there is no browser open)
@@ -32,7 +33,7 @@ dnbrowse_events:
                 - webserver stop port:<script[dnbrowse_config].data_key[port]>
                 - flag server dnbrowse_active:!
 
-        on webserver web request method:get priority:100 has_response:false:
+        on webserver web request port:8080 method:get priority:100 has_response:false:
             - if !<server.has_flag[dnbrowse_secret.<context.path.substring[2]>]>:
                 - determine code:401 passively
                 - determine headers:[Content-Type=text/plain] passively
@@ -40,20 +41,20 @@ dnbrowse_events:
             - else:
                 - determine code:200 passively
                 - determine "headers:<map.with[Content-Type].as[text/html; charset=UTF-8]>" passively
-                - determine file:/dnbrowse.html
-        on webserver web request path:/favicon.ico method:get:
+                - determine file:/dnbrowse/index.html
+        on webserver web request port:8080 path:/dnbrowse/favicon.ico method:get:
             - determine code:200 passively
             - determine headers:[Content-Type=image/x-icon] passively
             - determine file:favicon.ico
-        on webserver web request path:/css/* method:get:
+        on webserver web request port:8080 path:/dnbrowse/normalize.css method:get:
             - determine code:200 passively
             - determine headers:[Content-Type=text/css] passively
             - determine file:<context.path>
-        on webserver web request path:/js/* method:get:
+        on webserver web request port:8080 path:/dnbrowse/dnbrowse.js|/dnbrowse/jquery.min.js method:get:
             - determine code:200 passively
             - determine "headers:<map.with[Content-Type].as[text/javascript; charset=UTF-8]>" passively
             - determine file:<context.path>
-        on webserver web request path:/ajax method:get:
+        on webserver web request port:8080 path:/dnbrowse/ajax method:get:
             - define dnbrowse_secret <context.query.get[secret]>
             - if !<server.has_flag[dnbrowse_secret.<[dnbrowse_secret]>]>:
                 - determine code:401 passively
@@ -103,7 +104,7 @@ dnbrowse_events:
                             - definemap data:
                                 error: "Unknown player '<[p]>'"
 
-                    - case load_notables:
+                    - case load_notes:
                         - define data <map>
                         - foreach locations|cuboids|ellipsoids|polygons|inventories as:type:
                             - foreach <server.notes[<[type]>]> as:note:
@@ -152,7 +153,7 @@ dnbrowse_command:
     type: command
     debug: false
     name: dnbrowse
-    description: Creates an HTML interface to browse Denizen flags & notables
+    description: Creates an HTML interface to browse Denizen Flags & Notes
     usage: /dnbrowse
     permission: custom.dnbrowse
 
