@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DnBrowse</title>
+<link rel=stylesheet href="/css/normalize.css" type="text/css">
+<style>
+html, body {
+	height: 100%;
+	font-size: 62.5%;
+	overflow: hidden;
+}
+body {
+	background-color: #1e1e1e;
+	color: #ffffff;
+	font-family: Consolas, "Courier New", monospace;
+	margin: 0;
+	padding: 0;
+}
+#tabs {
+	font-size: 2.4rem;
+	border-bottom: 1px solid #444444;
+	color: #7D7D77;
+	height: calc(2.76rem + 20px);
+	margin-bottom: 5px;
+}
+#tabs span {
+	cursor: pointer;
+	display: inline-block;
+	padding: 10px 20px;
+	border-left: 1px solid #444444;
+	border-right: 1px solid #444444;
+}
+#tabs span.active {
+	background-color: #2d2d2d;
+	color: #ffffff;
+}
+#data {
+	font-size: 1.6rem;
+	padding: 10px;
+	height: calc(100% - 2.76rem - 45px);
+	overflow: auto;
+}
+#data div {
+	display: none;
+}
+#data div.active {
+	display: block;
+}
+</style>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/dnbrowse.js"></script>
+</head>
+<body>
+<div id=tabs>
+<span id=tab_server onclick="switchTab('server');">Server Flags</span><span id=tab_player onclick="switchTab('player');">Player Flags</span><span id=tab_notables onclick="switchTab('notables');">Notables</span>
+</div>
+<div id=data></div>
+</body>
+</html>
