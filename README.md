@@ -1,6 +1,6 @@
 # DnBrowse
 
-Denizen tool which creates an HTML interface to browse Flags and Notables.
+Denizen tool which creates an HTML interface to browse Flags and Notes.
 
 v0.1 2022-06-20
 
