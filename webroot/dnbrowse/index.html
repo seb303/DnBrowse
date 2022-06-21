@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>DnBrowse</title>
 <link rel=stylesheet href="/dnbrowse/normalize.css" type="text/css">
+<link rel=stylesheet href="/dnbrowse/jstree.css" type="text/css">
 <style>
 html, body {
 	height: 100%;
@@ -23,6 +24,8 @@ body {
 	color: #7D7D77;
 	height: calc(2.76rem + 20px);
 	margin-bottom: 5px;
+	white-space: nowrap;
+	position: relative;
 }
 #tabs span {
 	cursor: pointer;
@@ -35,26 +38,61 @@ body {
 	background-color: #2d2d2d;
 	color: #ffffff;
 }
+#search {
+	display: inline-block;
+	padding-left: 20px;
+	position: absolute;
+	top: 8px;
+	right: 15px;
+	z-index: -1;
+}
+#query {
+	background-color: #2d2d2d;
+	background-image: url(/dnbrowse/search.png);
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center right 3px;
+	border-radius: 0.25rem;
+	border: 1px solid #444444;
+	font-size: 1.6rem;
+	font-family: sans-serif;
+	color: #ffffff;
+	width: 20rem;
+	padding: 0.4rem 0.8rem;
+}
+#query:focus {
+	outline: none;
+}
 #data {
 	font-size: 1.6rem;
 	padding: 10px;
 	height: calc(100% - 2.76rem - 45px);
 	overflow: auto;
 }
-#data div {
+#data > div {
 	display: none;
 }
-#data div.active {
+#data > div.active {
 	display: block;
+}
+.key {
+	color: #33ccff;
+}
+.value {
+	color: #eeeeee;
+}
+.expires {
+	color: #dd5500
 }
 </style>
 <link rel="icon" type="image/x-icon" href="/dnbrowse/favicon.ico">
-<script type="text/javascript" src="/dnbrowse/jquery.min.js"></script>
+<script type="text/javascript" src="/dnbrowse/jquery-min.js"></script>
+<script type="text/javascript" src="/dnbrowse/jstree-min.js"></script>
 <script type="text/javascript" src="/dnbrowse/dnbrowse.js"></script>
 </head>
 <body>
 <div id=tabs>
-<span id=tab_server onclick="switchTab('server');">Server Flags</span><span id=tab_player onclick="switchTab('player');">Player Flags</span><span id=tab_notes onclick="switchTab('notes');">Notes</span>
+	<span id=tab_server onclick="switchTab('server');">Server Flags</span><span id=tab_player onclick="switchTab('player');">Player Flags</span><span id=tab_notes onclick="switchTab('notes');">Notes</span><form id=search><input type=search id=query></form>
 </div>
 <div id=data></div>
 </body>
