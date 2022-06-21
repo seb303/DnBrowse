@@ -2,13 +2,13 @@
 
 Denizen tool which creates an HTML interface to browse Flags and Notes.
 
-v0.1 2022-06-20
+v0.2 2022-06-21
 
 ## Installation
 
 Requires Denizen-1.2.5-b6309-DEV or newer.
 
-Copy the files into the `Denizens` directory (within scripts and webroot).
+Copy the files into the `Denizens` directory (within scripts/ and webroot/dnbrowse/).
 
 The following config options should be set in `Denizen/config.yml`:
 - `Commands/WebServer/Allow: true`
