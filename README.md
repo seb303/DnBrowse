@@ -2,7 +2,7 @@
 
 Denizen tool which creates an HTML interface to browse Flags and Notes.
 
-v0.2 2022-06-21
+v0.4 2022-06-23
 
 ## Installation
 
