@@ -78,11 +78,26 @@ body {
 .key {
 	color: #33ccff;
 }
+.key.expired {
+	color: #00698C;
+}
 .value {
 	color: #eeeeee;
 }
 .expires {
-	color: #dd5500
+	margin-left: 5px;
+	vertical-align: middle;
+	height: 1.6rem;
+}
+#hoverinfo {
+	display: none;
+	position: absolute;
+	font-size: 1.6rem;
+	font-family: sans-serif;
+	background-color: #dd5500;
+	color: #ffffff;
+	padding: 2px 5px;
+	border-radius: 0.25rem;
 }
 </style>
 <link rel="icon" type="image/x-icon" href="/dnbrowse/favicon.ico">
@@ -95,5 +110,6 @@ body {
 	<span id=tab_server onclick="switchTab('server');">Server Flags</span><span id=tab_player onclick="switchTab('player');">Player Flags</span><span id=tab_notes onclick="switchTab('notes');">Notes</span><form id=search><input type=search id=query></form>
 </div>
 <div id=data></div>
+<div id=hoverinfo><div>
 </body>
 </html>

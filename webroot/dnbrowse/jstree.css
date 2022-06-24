@@ -314,7 +314,7 @@
   box-shadow: inset 0 0 1px #555;
 }
 .jstree-default-dark .jstree-clicked {
-  background: #5fa2db;
+  background: #264f78;
   border-radius: 2px;
   box-shadow: inset 0 0 1px #666666;
 }
@@ -1115,10 +1115,10 @@
 }
 .jstree-default-dark .jstree-clicked,
 .jstree-default-dark .jstree-checked {
-  color: white;
+  xcolor: white;
 }
 .jstree-default-dark .jstree-hovered {
-  color: white;
+  xcolor: white;
 }
 #jstree-marker.jstree-default-dark {
   border-left-color: #999;
