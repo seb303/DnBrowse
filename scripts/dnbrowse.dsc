@@ -111,10 +111,23 @@ dnbrowse_events:
                         - foreach <server.offline_players> as:p:
                             - define data.offline.<[p]> <[p].name>
 
+                    - case get_player_name:
+                        - if <player[<context.query.get[player]>].exists>:
+                            - define data.name <player[<context.query.get[player]>].name>
+                        - else:
+                            - define data.name <empty>
+
+                    - case teleport:
+                        - if <[perms.tp]> && <location[<context.query.get[location]>].exists>:
+                            - teleport <location[<context.query.get[location]>]> player:<[player]>
+                            - define data.success true
+                        - else:
+                            - define data.success false
+
                     - case load_player:
                         - define p <context.query.get[player]||>
                         - if <player[<[p]>].is_player>:
-                            - define data <player[<[p]>].flag_map[]>
+                            - define data <player[<[p]>].flag_map>
                             - if !<[perms.secrets]>:
                                 - define data.dnbrowse_secret:!
                         - else:
