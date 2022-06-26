@@ -20,10 +20,10 @@ To get a link to the browser interface, run command `/dnbrowse`
 
 ## Permissions
 
-- custom.dnbrowse - base permission needed to use
-- custom.dnbrowse.tp - allow to teleport player to locations, etc.
-- custom.dnbrowse.edit - allow editing and deleting of flags and notese (not yet implemented)
-- custom.dnbrowse.secrets - allow to show dnbrowse_secret flags, otherwise these and dnbrowse_active are filtered
+- `custom.dnbrowse` base permission needed to use
+- `custom.dnbrowse.tp` allow to teleport player to locations, etc.
+- `custom.dnbrowse.edit` allow editing and deleting of flags and notese (not yet implemented)
+- `custom.dnbrowse.secrets` allow to show dnbrowse_secret flags, otherwise these and dnbrowse_active are filtered
 
 Note that depending on the permissions system, the player may need to be online for the permissions to function (i.e. if the web interface is reloaded while the player is offline then the permissions may default to false).
 
