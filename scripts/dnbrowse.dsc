@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v0.4 2022-06-23                                     ##
+## v0.5 2022-06-26                                     ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
