@@ -37,6 +37,10 @@ Currently server and player flags are supported. Other flaggable objects may be 
 
 All types of note can be browsed.
 
+### Search
+
+A search function allows searching of the data within the current tab. Note that player flags are loaded on demand when each player is expanded in the tree view, and only loaded players will be searched.
+
 ### Player heads
 
 If a player object is saved in a flag, an icon shows the player's head (from [crafatar.com](https://crafatar.com/)). When clicked, this shows the player's flags.
