@@ -2,7 +2,7 @@
 
 Denizen tool which creates an HTML interface to browse Flags and Notes.
 
-v0.4 2022-06-23
+v0.5 2022-06-26
 
 ## Installation
 
@@ -21,7 +21,7 @@ To get a link to the browser interface, run command `/dnbrowse`
 ## Permissions
 
 - custom.dnbrowse - base permission needed to use
-- custom.dnbrowse.tp - allow to teleport player to noted locations, etc. (not yet implemented)
+- custom.dnbrowse.tp - allow to teleport player to noted locations, etc.
 - custom.dnbrowse.edit - allow editing and deleting of flags and notables (not yet implemented)
 - custom.dnbrowse.secrets - allow to show dnbrowse_secret flags, otherwise these and dnbrowse_active are filtered
 
