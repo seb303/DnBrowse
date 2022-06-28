@@ -43,7 +43,7 @@ Expiring flags show an icon, with relative and absolute expiration times on mous
 
 ### Notes
 
-All types of note can be browsed: locations, areas and inventories.
+All types of note can be browsed: locations, cuboids, ellipsoids, polygons and inventories.
 
 ### Search
 
