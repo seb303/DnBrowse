@@ -29,12 +29,11 @@ function init() {
 	});
 	$("#search").submit(function(e) {
 		e.preventDefault();
-		// Need to change this to search active tab!!!!
-		$("#data_server").jstree(true).search($("#query").val());
+		$('#data_'+current_tab).jstree(true).search($('#query').val());
 	});
 }
 
-var players_list;
+var current_tab, players_list;
 function switchTab(tab) {
 	$('#tabs > span').removeClass('active');
 	$('#tab_'+tab).addClass('active');
@@ -63,8 +62,11 @@ function switchTab(tab) {
 				});
 				break;
 			case 'notes':
-				var json = JSON.stringify(data, null, 4);
-				$('#data_'+tab).html('<pre>'+escapeHtml(json)+'</pre>');
+				var jstree = $('#data_'+tab).jstree({
+					core: {
+						data: notesRootNode(data)
+					}
+				});
 				break;
 			}
 			jstree.on('hover_node.jstree', function(e, data) {
@@ -78,24 +80,54 @@ function switchTab(tab) {
 						showPlayerInfo(e.currentTarget, e.currentTarget.dataset.value);
 					})
 					.off('click').on('click', function(e) {
-						playerFlags(e.currentTarget.dataset.value);
+						showPlayerFlags(e.currentTarget.dataset.value);
+					});
+				
+				$('#'+data.node.id+' img.playerflags')
+					.off('mouseenter').on('mouseenter', function(e) {
+						showPlayerUuid(e.currentTarget, e.currentTarget.dataset.value);
+					})
+					.off('click').on('click', function(e) {
+						copyToClipboard(e.currentTarget.dataset.value);
 					});
 				
 				$('#'+data.node.id+' img.teleport')
 					.off('mouseenter').on('mouseenter', function(e) {
-						showTeleportInfo(e.currentTarget, e.currentTarget.dataset.expiration);
+						showTeleportInfo(e.currentTarget, e.currentTarget.dataset.value);
 					})
 					.off('click').on('click', function(e) {
 						teleportTo(e.currentTarget, e.currentTarget.dataset.value);
 					});
-			})
+				
+				$('#'+data.node.id+' img.areateleport')
+					.off('mouseenter').on('mouseenter', function(e) {
+						showAreaTeleportInfo(e.currentTarget, e.currentTarget.dataset.value);
+					})
+					.off('click').on('click', function(e) {
+						teleportTo(e.currentTarget, e.currentTarget.dataset.value);
+					});
+			}).on('ready.jstree', function(e, data) {
+				if (expand_player) {
+					data.instance.close_all();
+					data.instance.open_node(data.instance.get_parent(expand_player));
+					data.instance.open_node(expand_player);
+					expand_player = false;
+				}
+			});
 		})
 		.fail(function() {
 			alert('An error occurred:\n\n'+jqxhr.responseText);
 		});
+	} else if (expand_player) {
+		var instance = $('#data_player').jstree(true);
+		instance.close_all();
+		instance.open_node(instance.get_parent(expand_player));
+		instance.open_node(expand_player);
+		expand_player = false;
 	}
 	$('#data > div').removeClass('active');
 	$('#data_'+tab).addClass('active');
+	current_tab = tab;
 	window.location.hash = '#'+tab;
 }
 function loadPlayerFlags(node, cb) {
@@ -103,14 +135,18 @@ function loadPlayerFlags(node, cb) {
 		var players_tree = [];
 		if (players_list.online) {
 			players_tree[players_tree.length] = {
+				id: 'online_players',
 				text: 'Online Players',
-				children: playersTreeNode(players_list.online)
+				children: playersTreeNode(players_list.online),
+				li_attr: {class:'online'}
 			}
 		}
 		if (players_list.offline) {
 			players_tree[players_tree.length] = {
+				id: 'offline_players',
 				text: 'Offline Players',
-				children: playersTreeNode(players_list.offline)
+				children: playersTreeNode(players_list.offline),
+				li_attr: {class:'offline'}
 			}
 		}
 		cb.call(this, players_tree);
@@ -122,9 +158,6 @@ function loadPlayerFlags(node, cb) {
 			alert('An error occurred:\n\n'+jqxhr.responseText);
 		});
 	}
-}
-function showPlayerFlags(p) {
-	alert(p);
 }
 
 function flagTreeNode(flags) {
@@ -143,37 +176,51 @@ function flagTreeNode(flags) {
 			var keys = Object.keys(flags).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
 			for (var i=0; i < keys.length; i++) {
 				let key = keys[i];
-				if (flags[key].__expiration && typeof flags[key].__expiration != 'object') {
-					var expiration = parseTimeTag(flags[key].__expiration).getTime();
-					var expires = expiration - (new Date()).getTime() - time_offset;
-					if (expires > 0 || options.show_expired_flags) {
-						var text = escapeHtml(key);
-						text += '<img class=expires src="/dnbrowse/expires.png" data-expiration="'+expiration+'">';
-						node[node.length] = {
-							text: text,
-							children: flagTreeNode(flags[key])
-						};
-					}
-				} else {
-					node[node.length] = {
-						text: escapeHtml(key),
-						children: flagTreeNode(flags[key])
-					};
+				var nodeElement = flagNodeElement(key, flags[key]);
+				if (nodeElement) {
+					node[node.length] = nodeElement;
 				}
 			}
 		}
 	}
 	return node;
 }
+function flagNodeElement(key, value) {
+	if (value.__expiration && typeof value.__expiration != 'object') {
+		var expiration = parseTimeTag(value.__expiration).getTime();
+		var expires = expiration - (new Date()).getTime() - time_offset;
+		if (expires > 0 || options.show_expired_flags) {
+			var text = escapeHtml(key);
+			text += '<img class=expires src="/dnbrowse/expires.png" data-expiration="'+expiration+'">';
+			return {
+				text: text,
+				children: flagTreeNode(value),
+				li_attr: expires > 0 ? {class:'key'} : {class:'key expired'}
+			};
+		}
+	} else {
+		return {
+			text: escapeHtml(key),
+			children: flagTreeNode(value),
+			li_attr: {class:'key'}
+		};
+	}
+	return false;
+}
 function nodeValue(value) {
 	var text = escapeHtml(value);
 	if (value.startsWith('p@')) {
 		var uuid = value.substring(2);
-		text += '<img class=player src="https://crafatar.com/avatars/'+uuid+'" data-value="'+escapeHtml(value)+'">';
+		text += '<img class=player src="https://crafatar.com/avatars/'+uuid+'" data-value="'+escapeHtml(uuid)+'">';
 	} else if (options.tp && value.startsWith('l@')) {
 		text += '<img class=teleport src="/dnbrowse/teleport.png" data-value="'+escapeHtml(value)+'">';
+	} else if (options.tp && (value.startsWith('cu@') || value.startsWith('ellipsoid@') || value.startsWith('polygon@'))) {
+		text += '<img class=areateleport src="/dnbrowse/teleport.png" data-value="'+escapeHtml(value)+'">';
 	}
-	return text;
+	return {
+		text: text,
+		li_attr: {class:'value'}
+	};
 }
 
 function playersTreeNode(players) {
@@ -182,14 +229,140 @@ function playersTreeNode(players) {
 	for (var i=0; i < keys.length; i++) {
 		let p = keys[i];
 		node[node.length] = {
-			text: escapeHtml(players[p]),
+			id: players[p].uuid,
+			text: escapeHtml(players[p].name)+'<img class=playerflags src="https://crafatar.com/avatars/'+players[p].uuid+'" data-value="'+players[p].uuid+'">',
 			player: p,
-			children: true
+			children: true,
+			li_attr: {class:'player'}
 		};
 	}
 	return node;
 }
 
+function notesRootNode(notes) {
+	var node = [];
+	var notetypes = ['locations','cuboids','ellipsoids','polygons','inventories'];
+	for (var i=0; i < notetypes.length; i++) {
+		let notetype = notetypes[i];
+		if (notes[notetype]) {
+			node[node.length] = {
+				text: notetype,
+				children: notesTreeNode(notes[notetype], notetype),
+				li_attr: {class:'notetype'}
+			};
+			console.log(notes[notetype]);
+		}
+	}
+	return node;
+}
+function notesTreeNode(notes, notetype) {
+	var node = [];
+	if (!notes.name) {
+		var keys = Object.keys(notes).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+		for (var i=0; i < keys.length; i++) {
+			let key = keys[i];
+			var text = notes[key].name ? notes[key].name : key.replace(/^in@/, '');
+			switch(notetype) {
+				case 'locations':
+					text += '<img class=teleport src="/dnbrowse/teleport.png" data-value="'+escapeHtml(key)+'">';
+					break;
+				case 'cuboids':
+				case 'ellipsoids':
+				case 'polygons':
+					text += '<img class=areateleport src="/dnbrowse/teleport.png" data-value="'+escapeHtml(key)+'">';
+					break;
+			}
+			node[node.length] = {
+				text: text,
+				children: notesTreeNode(notes[key], notetype),
+				li_attr: {class:'key'}
+			};
+		}
+	} else {
+		var keys = Object.keys(notes).sort(function(a,b) {
+			if (a == 'slots') {
+				return 1;
+			}
+			if (b == 'slots') {
+				return -1;
+			}
+			return a.localeCompare(b, undefined, {numeric: true});
+		});
+		for (var i=0; i < keys.length; i++) {
+			let key = keys[i];
+			if (typeof notes[key] != 'object') {
+				node[node.length] = {
+					text: key+' <span class=equals>=</span> <span class=value>'+escapeHtml(notes[key])+'</span>'
+				};
+			} else {
+				node[node.length] = {
+					text: key,
+					children: notesTreeSubNode(key, notes[key]),
+					li_attr: {class:'key'}
+				};
+			}
+		}
+	}
+	return node;
+}
+function notesTreeSubNode(key, value) {
+	var node = [];
+	if (value.constructor === Array) {
+		for (var i=0; i < value.length; i++) {
+			if (typeof value[i] != 'object') {
+				node[node.length] = {
+					text: escapeHtml(value[i], true),
+					li_attr: {class:'value'}
+				};
+			} else {
+				node[node.length] = {
+					text: ''+(i+1),
+					children: notesTreeSubNode(i, value[i]),
+					li_attr: {class:'key'}
+				};
+			}
+		}
+	} else if (typeof value == 'object') {
+		var keys = Object.keys(value).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+		for (var i=0; i < keys.length; i++) {
+			let subkey = keys[i];
+			if (typeof value[subkey] != 'object') {
+				node[node.length] = {
+					text: subkey+' <span class=equals>=</span> <span class=value>'+escapeHtml(value[subkey], true)+'</span>'
+				};
+			} else {
+				if (key == 'flags') {
+					console.log(value);
+				}
+				if (key == 'slots') {
+					var subkey_label = '<span class=value>'+subkey+' <span class=equals>=</span> '+escapeHtml(value[subkey].name);
+					delete value[subkey].name;
+					if (value[subkey].display) {
+						subkey_label += ' '+escapeHtml(value[subkey].display, true, true);
+					}
+					if (value[subkey].quantity) {
+						subkey_label += ' <span class=quantity>x'+value[subkey].quantity+'</span>';
+					}
+					subkey_label += '</span>';
+				} else {
+					var subkey_label = subkey;
+				}
+				if (key == 'flags') {
+					var nodeElement = flagNodeElement(subkey, value[subkey]);
+					if (nodeElement) {
+						node[node.length] = nodeElement;
+					}
+				} else {
+					node[node.length] = {
+						text: subkey_label,
+						children: notesTreeSubNode(subkey, value[subkey])
+					};
+				}
+			}
+		}
+	}
+	return node;
+}
 function showExpiry(el, expiration) {
 	var server_time = (new Date()).getTime() + time_offset;
 	var expires = expiration-server_time;
@@ -204,8 +377,8 @@ function showExpiry(el, expiration) {
 	html += ' @ '+d.toLocaleTimeString()+' '+d.toLocaleDateString([], {timeZoneName: 'short'});
 	showHoverInfo(el, html);
 }
-function showPlayerInfo(el, p) {
-	var jqxhr = $.getJSON( '/ajax', {secret: secret, action: 'get_player_name', player: p}, function(data) {
+function showPlayerInfo(el, player) {
+	var jqxhr = $.getJSON( '/ajax', {secret: secret, action: 'get_player_name', player: player}, function(data) {
 		var html = 'Player '+data.name+' - click to browse flags';
 		showHoverInfo(el, html);
 	})
@@ -213,16 +386,27 @@ function showPlayerInfo(el, p) {
 		alert('An error occurred:\n\n'+jqxhr.responseText);
 	});
 }
-function playerFlags(p) {
+var expand_player = false;
+function showPlayerFlags(player) {
+	expand_player = player;
 	switchTab('player');
-	showPlayerFlags(p);
 }
-function showTeleportInfo(el, l) {
+function showPlayerUuid(el, player) {
+	showHoverInfo(el, el.dataset.value+' - click to copy');
+}
+function copyToClipboard(s) {
+	navigator.clipboard.writeText(s);
+}
+function showTeleportInfo(el, location) {
 	var html = 'Click to teleport here';
 	showHoverInfo(el, html);
 }
-function teleportTo(el, l) {
-	var jqxhr = $.getJSON( '/ajax', {secret: secret, action: 'teleport', location: l}, function(data) {
+function showAreaTeleportInfo(el, area) {
+	var html = 'Click to teleport to center, and select area';
+	showHoverInfo(el, html);
+}
+function teleportTo(el, destination) {
+	var jqxhr = $.getJSON( '/ajax', {secret: secret, action: 'teleport', destination: destination}, function(data) {
 		showHoverInfo(el, 'Teleport succeeded!');
 		if (data.success == 'true') {
 			el.src = '/dnbrowse/teleport_active.png';
@@ -322,15 +506,62 @@ function parseTimeTag(input) {
 	return d;
 }
 
-function escapeHtml(text) {
-	var map = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#039;'
-	};
-	return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+var htmlMap = {
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#039;'
+};
+var colorMap = {
+	'§0': {tag:'<span style="color:#000000;">', reset: true},
+	'§1': {tag:'<span style="color:#0000aa;">', reset: true},
+	'§2': {tag:'<span style="color:#00aa00;">', reset: true},
+	'§3': {tag:'<span style="color:#00aaaa;">', reset: true},
+	'§4': {tag:'<span style="color:#aa0000;">', reset: true},
+	'§5': {tag:'<span style="color:#aa00aa;">', reset: true},
+	'§6': {tag:'<span style="color:#ffaa00;">', reset: true},
+	'§7': {tag:'<span style="color:#aaaaaa;">', reset: true},
+	'§8': {tag:'<span style="color:#555555;">', reset: true},
+	'§9': {tag:'<span style="color:#5555ff;">', reset: true},
+	'§a': {tag:'<span style="color:#55ff55;">', reset: true},
+	'§b': {tag:'<span style="color:#55ffff;">', reset: true},
+	'§c': {tag:'<span style="color:#ff5555;">', reset: true},
+	'§d': {tag:'<span style="color:#ff55ff;">', reset: true},
+	'§e': {tag:'<span style="color:#ffff55;">', reset: true},
+	'§f': {tag:'<span style="color:#ffffff;">', reset: true},
+	'§l': {tag:'<span style="font-weight:bold;">', reset: false},
+	'§m': {tag:'<span style="text-decoration:line-through;">', reset: false},
+	'§n': {tag:'<span style="text-decoration:underline;">', reset: false},
+	'§o': {tag:'<span style="font-style:italic;">', reset: false},
+	'§r': {reset: true}
+};
+function escapeHtml(text, bColors, bHideColorCodes) {
+	text = text.replace(/[&<>"']/g, function(m) { return htmlMap[m]; });
+	if (bColors) {
+		var tagCount = 0;
+		text = text.replace(/§[0-9a-flmnor]/g, function(m) {
+			if (bHideColorCodes) {
+				var res = '';
+			} else {
+				var res = m;
+			}
+			if (colorMap[m].reset) {
+				for (; tagCount > 0; tagCount--) {
+					res += '</span>';
+				}
+			}
+			if (colorMap[m].tag) {
+				res += colorMap[m].tag;
+				tagCount++;
+			}
+			return res;
+		});
+		for (; tagCount > 0; tagCount--) {
+			text += '</span>';
+		}
+	}
+	return text;
 }
 
 $(document).ready(init);

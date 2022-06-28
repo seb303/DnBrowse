@@ -74,16 +74,25 @@ body {
 #data > div.active {
 	display: block;
 }
+.online, .offline, .player, .notetype {
+	color: #7777ff;
+}
 .key {
 	color: #33ccff;
 }
 .key.expired {
 	color: #00698C;
 }
+.equals {
+	color: #7D7D77;
+}
 .value {
 	color: #eeeeee;
 }
-img.expires, img.player, img.teleport {
+.quantity {
+	color: #A0A09A;
+}
+img.expires, img.player, img.teleport, img.areateleport, img.playerflags {
 	margin-left: 5px;
 	vertical-align: middle;
 	height: 1.6rem;
@@ -100,10 +109,10 @@ img.expires, img.player, img.teleport {
 #hoverinfo.expires {
 	background-color: #dd5500;
 }
-#hoverinfo.player {
+#hoverinfo.player, #hoverinfo.playerflags {
 	background-color: #7777ff;
 }
-#hoverinfo.teleport {
+#hoverinfo.teleport, #hoverinfo.areateleport {
 	background-color: #007700;
 }
 </style>
