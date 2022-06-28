@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v0.6 2022-06-28                                     ##
+## v0.7 2022-06-28                                     ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
@@ -14,7 +14,6 @@ dnbrowse_config:
     address: localhost
 
     # Port for internal webserver to listen on
-    # Note: this port number will also need changing in the "webserver web request" event below
     port: 6464
 
     # Timeout period in seconds (after this time the internal webserver is stopped if there is no browser open)
@@ -48,7 +47,10 @@ dnbrowse_events:
                 - webserver stop port:<script[dnbrowse_config].data_key[port]>
                 - flag server dnbrowse_active:!
 
-        on webserver web request port:6464 method:get:
+        on webserver web request method:get priority:-1000:
+            # Check port
+            - if <context.port> != <script[dnbrowse_config].data_key[port]>:
+                - stop
             # Index page served from secret URL
             - if <context.path.length> == 13 && <server.has_flag[dnbrowse_secret.<context.path.substring[2]>]>:
                 - determine code:200 passively
