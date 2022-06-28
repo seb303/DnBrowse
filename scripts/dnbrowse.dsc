@@ -16,8 +16,8 @@ dnbrowse_config:
     # Port for internal webserver to listen on
     port: 6464
 
-    # Timeout period in seconds (after this time the internal webserver is stopped if there is no browser open)
-    timeout: 300
+    # Timeout period (after this time the internal webserver is stopped if there is no browser open)
+    timeout: 5m
 
     # Whether expired flags which haven't yet been cleaned up should be shown in the browser
     show_expired_flags: false
@@ -71,9 +71,9 @@ dnbrowse_events:
                 # Get player (can have value "server" if started from console)
                 - define player <server.flag[dnbrowse_secret.<[dnbrowse_secret]>]>
                 # Refresh secret expiry
-                - flag server dnbrowse_secret.<[dnbrowse_secret]>:<[player]> expire:<script[dnbrowse_config].data_key[timeout]>s
+                - flag server dnbrowse_secret.<[dnbrowse_secret]>:<[player]> expire:<script[dnbrowse_config].data_key[timeout]>
                 - if <[player]> != server:
-                    - flag <[player]> dnbrowse_secret:<[dnbrowse_secret]> expire:<script[dnbrowse_config].data_key[timeout]>s
+                    - flag <[player]> dnbrowse_secret:<[dnbrowse_secret]> expire:<script[dnbrowse_config].data_key[timeout]>
                     - definemap perms:
                         tp: <[player].has_permission[custom.dnbrowse.tp].if_null[false]>
                         edit: <[player].has_permission[custom.dnbrowse.edit].if_null[false]>
@@ -94,7 +94,7 @@ dnbrowse_events:
 
                     - case get_options:
                         - definemap data:
-                            timeout: <script[dnbrowse_config].data_key[timeout]>
+                            timeout: <duration[<script[dnbrowse_config].data_key[timeout]>].in_seconds>
                             show_expired_flags: <script[dnbrowse_config].data_key[show_expired_flags]>
                             tp: <[perms.tp]>
                             edit: <[perms.edit]>
@@ -286,10 +286,10 @@ dnbrowse_command:
             - define dnbrowse_secret <script[dnbrowse_command].data_key[path_chars].to_list.random[12].separated_by[]>
         # Save secret / refresh expiry
         - if <context.source_type> == player:
-            - flag server dnbrowse_secret.<[dnbrowse_secret]>:<player> expire:<script[dnbrowse_config].data_key[timeout]>s
-            - flag <player> dnbrowse_secret:<[dnbrowse_secret]> expire:<script[dnbrowse_config].data_key[timeout]>s
+            - flag server dnbrowse_secret.<[dnbrowse_secret]>:<player> expire:<script[dnbrowse_config].data_key[timeout]>
+            - flag <player> dnbrowse_secret:<[dnbrowse_secret]> expire:<script[dnbrowse_config].data_key[timeout]>
         - else:
-            - flag server dnbrowse_secret.<[dnbrowse_secret]>:server expire:<script[dnbrowse_config].data_key[timeout]>s
+            - flag server dnbrowse_secret.<[dnbrowse_secret]>:server expire:<script[dnbrowse_config].data_key[timeout]>
 
         # Ensure webserver is running
         - if !<server.has_flag[dnbrowse_active]>:
