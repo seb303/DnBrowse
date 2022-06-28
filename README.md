@@ -35,7 +35,7 @@ Shows a tree view of Denizen data within a web-browser.
 
 ### Flags
 
-Currently supports: server flags and player flags, plus flags attached to noted locations, areas, inventories and inventory items. Note that location flags are stored with chunk data and so will only be available if the chunk is currently loaded.
+Currently supports: server flags and player flags, plus flags attached to noted locations, areas, inventories and inventory items. Bear in mind that location flags are stored with chunk data and so will only be available if the chunk is currently loaded.
 
 Other flaggable objects may be added later.
 
