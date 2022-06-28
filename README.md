@@ -33,9 +33,11 @@ Shows a tree view of Denizen data within a web-browser.
 
 ### Flags
 
-Currently supports: server flags, player flags, and item flags within noted inventories. Other flaggable objects may be added later.
+Currently supports: server flags and player flags, plus flags attached to noted locations, areas, inventories and inventory items. Note that location flags are stored with chunk data and so will only be available if the chunk is currently loaded.
 
-Expiring flags show an icon, with relative and absolute expiration times.
+Other flaggable objects may be added later.
+
+Expiring flags show an icon, with relative and absolute expiration times on mouseover.
 
 ### Notes
 
@@ -51,7 +53,7 @@ Player objects show the player's head (from [crafatar.com](https://crafatar.com/
 
 ### Teleport
 
-If a Location or AreaObject is saved in flag or note, an icon allows the player who launched DnBrowse to be teleported to the location. In the case of an AreaObject the player will be teleported to the center and the area will be selected with the Denizen Area Selector Tool and/or WorldEdit, if available.  Requires permission `custom.dnbrowse.tp`
+If a Location or AreaObject is saved in flag or note, clicking an icon allows the player who launched DnBrowse to be teleported to the location. In the case of an AreaObject the player will be teleported to the center and the area will be selected with the Denizen Area Selector Tool and/or WorldEdit, if available.  Requires permission `custom.dnbrowse.tp`
 
 ## Screenshots
 
