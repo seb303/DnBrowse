@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v0.8 2022-06-28                                     ##
+## v0.9 2022-06-28                                     ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
@@ -185,9 +185,8 @@ dnbrowse_events:
                                         - define data.<[type]>.<[note]>.pitch <[note].pitch>
                                         - define data.<[type]>.<[note]>.world <[note].world.name>
                                     - case cuboids:
-                                        - define corners <[note].corners>
-                                        - define data.<[type]>.<[note]>.from <[corners].get[1].xyz>
-                                        - define data.<[type]>.<[note]>.to <[corners].get[8].xyz>
+                                        - define data.<[type]>.<[note]>.min <[note].min.xyz>
+                                        - define data.<[type]>.<[note]>.max <[note].max.xyz>
                                         - define data.<[type]>.<[note]>.world <[note].world.name>
                                     - case ellipsoids:
                                         - define data.<[type]>.<[note]>.center <[note].location.xyz>
