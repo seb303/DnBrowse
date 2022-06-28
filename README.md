@@ -52,3 +52,7 @@ Player objects show the player's head (from [crafatar.com](https://crafatar.com/
 ### Teleport
 
 If a Location or AreaObject is saved in flag or note, an icon allows the player who launched DnBrowse to be teleported to the location. In the case of an AreaObject the player will be teleported to the center and the area will be selected with the Denizen Area Selector Tool and/or WorldEdit, if available.  Requires permission `custom.dnbrowse.tp`
+
+![Server Flags](https://github.com/eb303/DnBrowse/blob/main/readme-images/server-flags.png?raw=true)
+![Player Flags](https://github.com/eb303/DnBrowse/blob/main/readme-images/player-flags.png?raw=true)
+![Notes](https://github.com/eb303/DnBrowse/blob/main/readme-images/notes.png?raw=true)
