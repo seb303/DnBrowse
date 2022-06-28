@@ -33,6 +33,8 @@ Note that depending on the permissions system, the player may need to be online 
 
 Currently supports: server flags, player flags, and item flags within noted inventories. Other flaggable objects may be added later.
 
+Expiring flags show an icon, with relative and absolute times.
+
 ### Notes
 
 All types of note can be browsed.
@@ -43,7 +45,7 @@ A search function allows searching of the data within the current tab. Note that
 
 ### Player heads
 
-If a player object is saved in a flag, an icon shows the player's head (from [crafatar.com](https://crafatar.com/)). When clicked, this shows the player's flags.
+Player objects show the player's head (from [crafatar.com](https://crafatar.com/)). Clicking the head opens the player's flags.
 
 ### Teleport
 
