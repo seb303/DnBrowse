@@ -39,7 +39,7 @@ All types of note can be browsed.
 
 ### Search
 
-A search function allows searching of the data within the current tab. Note that player flags are loaded on demand when each player is expanded in the tree view, and only loaded players will be searched.
+A search function allows searching of the data within the current tab. Note that since player flags are loaded on demand when each player is expanded in the tree view, only loaded players will be searched.
 
 ### Player heads
 
