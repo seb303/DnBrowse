@@ -31,7 +31,7 @@ Note that depending on the permissions system, the player may need to be online 
 
 ### Flags
 
-Currently server and player flags are supported. Other flaggable objects may be added later.
+Currently supports: server flags, player flags, and item flags within noted inventories. Other flaggable objects may be added later.
 
 ### Notes
 
