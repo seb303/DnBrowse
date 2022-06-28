@@ -39,13 +39,13 @@ Expiring flags show an icon, with relative and absolute expiration times.
 
 ### Notes
 
-All types of note can be browsed.
+All types of note can be browsed: locations, areas and inventories.
 
 ### Search
 
 A search function allows searching of the data within the current tab. Note that since player flags are loaded on demand when each player is expanded in the tree view, only loaded players will be searched.
 
-### Player heads
+### Player objects
 
 Player objects show the player's head (from [crafatar.com](https://crafatar.com/)). Clicking the head opens the player's flags.
 
