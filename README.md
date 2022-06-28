@@ -14,6 +14,8 @@ The following config options should be set in `Denizen/config.yml`:
 - `Commands/WebServer/Allow: true`
 - `Tags/List flags/I know what im doing and need this: true`
 
+Edit the config options at the start of `scripts/dnbrowse.dsc` to set the server address and which port the interface should use.
+
 ## Usage
 
 To get a link to the browser interface, run command `/dnbrowse`
