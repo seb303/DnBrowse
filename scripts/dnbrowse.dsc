@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v0.5 2022-06-26                                     ##
+## v0.6 2022-06-28                                     ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
@@ -37,6 +37,11 @@ dnbrowse_events:
             gif: image/gif
             css: text/css
             js: text/javascript; charset=UTF-8
+        # Map of properties as returned by .property_map to fields used for JSON data
+        properties:
+            flag_map: flags
+            firework: firework_data
+            script: scriptname
     events:
         on delta time secondly every:10 server_flagged:dnbrowse_active:
             - if <server.flag[dnbrowse_secret].size> == 0:
@@ -107,9 +112,13 @@ dnbrowse_events:
                             online: <map>
                             offline: <map>
                         - foreach <server.online_players> as:p:
-                            - define data.online.<[p]> <[p].name>
+                            - definemap data.online.<[p]>:
+                                name: <[p].name>
+                                uuid: <[p].uuid>
                         - foreach <server.offline_players> as:p:
-                            - define data.offline.<[p]> <[p].name>
+                            - definemap data.offline.<[p]>:
+                                name: <[p].name>
+                                uuid: <[p].uuid>
 
                     - case get_player_name:
                         - if <player[<context.query.get[player]>].exists>:
@@ -118,15 +127,40 @@ dnbrowse_events:
                             - define data.name <empty>
 
                     - case teleport:
-                        - if <[perms.tp]> && <location[<context.query.get[location]>].exists>:
-                            - teleport <location[<context.query.get[location]>]> player:<[player]>
-                            - define data.success true
-                        - else:
+                        - define areaType null
+                        - if <[perms.tp]>:
+                            - if <location[<context.query.get[destination]>].exists>:
+                                - teleport <location[<context.query.get[destination]>]> player:<[player]>
+                                - define areaType location
+                            - else if <cuboid[<context.query.get[destination]>].exists>:
+                                - define area <cuboid[<context.query.get[destination]>]>
+                                - define center <[area].center>
+                                - define areaType cuboid
+                            - else if <ellipsoid[<context.query.get[destination]>].exists>:
+                                - define area <ellipsoid[<context.query.get[destination]>]>
+                                - define center <[area].location>
+                                - define areaType ellipsoid
+                            - else if <polygon[<context.query.get[destination]>].exists>:
+                                - define area <polygon[<context.query.get[destination]>]>
+                                - define center <[area].corners.first.with_x[<[area].corners.parse[x].average>].with_y[<[area].min_y.add[<[area].max_y>].div[2]>].with_z[<[area].corners.parse[z].average>]>
+                                - define areaType polygon
+
+                        - if <[areaType]> == null:
                             - define data.success false
+                        - else:
+                            - if <[areaType]> != location:
+                                - teleport <[center]> player:<[player]>
+                                - if <script[seltool_command].exists>:
+                                    - flag <[player]> seltool_selection:<[area]>
+                                    - flag <[player]> seltool_type:<[areaType]>
+                                - if <plugin[Depenizen].exists> && <plugin[WorldEdit].exists>:
+                                    - adjust <[player]> we_selection:<[area]>
+                            - define data.success true
 
                     - case load_player:
                         - define p <context.query.get[player]||>
                         - if <player[<[p]>].is_player>:
+                            ## .flag_map is not an error in this case (ignore Denizen Script Checker)
                             - define data <player[<[p]>].flag_map>
                             - if !<[perms.secrets]>:
                                 - define data.dnbrowse_secret:!
@@ -139,6 +173,8 @@ dnbrowse_events:
                         - foreach locations|cuboids|ellipsoids|polygons|inventories as:type:
                             - foreach <server.notes[<[type]>]> as:note:
                                 - define data.<[type]>.<[note]>.name <[note].note_name>
+                                - if <[note].flag_map.exists> &&  <[note].flag_map.size> > 0:
+                                    - define data.<[type]>.<[note]>.flags:<[note].flag_map>
                                 - choose <[type]>:
                                     - case locations:
                                         - define data.<[type]>.<[note]>.xyz <[note].xyz>
@@ -163,16 +199,38 @@ dnbrowse_events:
                                         - define data.<[type]>.<[note]>.slots <map>
                                         - define data.<[type]>.<[note]>.title <[note].title>
                                         - if <[note].script.exists>:
-                                            - define data.<[type]>.<[note]>.script <[note].script.name>
-                                        - else:
-                                            - define data.<[type]>.<[note]>.script <empty>
+                                            - define data.<[type]>.<[note]>.scriptname <[note].script.name>
                                         - foreach <[note].map_slots> key:slot as:item:
-                                            - definemap data.<[type]>.<[note]>.slots.<[slot]>:
+                                            - definemap slotdata:
                                                 name: <[item].material.name>
-                                                display: <[item].display||>
-                                                lore: <[item].lore||>
-                                                enchantments: <[item].enchantment_map>
-                                                quantity: <[item].quantity>
+                                                material: <[item].material>
+                                            - if <[item].quantity> != 1:
+                                                - define slotdata.quantity:<[item].quantity>
+                                            - if <[item].effects_data.exists>:
+                                                - define slotdata.potion_effects:<[item].effects_data>
+                                            - if <[item].enchantment_map.size> > 0:
+                                                - define slotdata.enchantments:<[item].enchantment_map>
+                                            - if <[item].firework_data.exists> && <[item].firework_data.size> > 0:
+                                                - define slotdata.firework_data:<[item].firework_data>
+                                            - if <[item].has_display>:
+                                                - define slotdata.display:<[item].display>
+                                            - if <[item].has_lore>:
+                                                - define slotdata.lore:<[item].lore>
+                                            - if <[item].skull_skin.exists>:
+                                                - define slotdata.skull_skin:<[item].skull_skin>
+                                            - if <[item].hides.size> > 0:
+                                                - define slotdata.hides:<[item].hides>
+                                            - if <[item].script.exists>:
+                                                - define slotdata.scriptname:<[item].script.name>
+                                            - if <[item].flag_map.size> > 0:
+                                                - define slotdata.flags:<[item].flag_map>
+                                            # Check for any additional properties which have not been handled manually
+                                            - foreach <[item].property_map> key:prop as:value:
+                                                - if <script[dnbrowse_events].data_key[data.properties].contains[<[prop]>]>:
+                                                    - define prop <script[dnbrowse_events].data_key[data.properties].get[<[prop]>]>
+                                                - if !<[slotdata].contains[<[prop]>]>:
+                                                    - define slotdata.<[prop]>:<[value]>
+                                            - define data.<[type]>.<[note]>.slots.<[slot]> <[slotdata]>
 
                     - default:
                         - definemap data:
