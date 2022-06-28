@@ -29,6 +29,8 @@ Note that depending on the permissions system, the player may need to be online 
 
 ## Features
 
+Shows a tree-view of Denizen data within a web-browser.
+
 ### Flags
 
 Currently supports: server flags, player flags, and item flags within noted inventories. Other flaggable objects may be added later.
