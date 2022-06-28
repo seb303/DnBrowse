@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v0.7 2022-06-28                                     ##
+## v0.8 2022-06-28                                     ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
@@ -155,6 +155,7 @@ dnbrowse_events:
                                 - if <script[seltool_command].exists>:
                                     - flag <[player]> seltool_selection:<[area]>
                                     - flag <[player]> seltool_type:<[areaType]>
+                                    - execute as_player selshow player:<[player]>
                                 - if <plugin[Depenizen].exists> && <plugin[WorldEdit].exists>:
                                     - adjust <[player]> we_selection:<[area]>
                             - define data.success true
