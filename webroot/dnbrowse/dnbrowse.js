@@ -88,7 +88,7 @@ function switchTab(tab) {
 						showPlayerUuid(e.currentTarget, e.currentTarget.dataset.value);
 					})
 					.off('click').on('click', function(e) {
-						copyToClipboard(e.currentTarget.dataset.value);
+						copyToClipboard(e.currentTarget, e.currentTarget.dataset.value);
 					});
 				
 				$('#'+data.node.id+' img.teleport')
@@ -394,7 +394,8 @@ function showPlayerFlags(player) {
 function showPlayerUuid(el, player) {
 	showHoverInfo(el, el.dataset.value+' - click to copy');
 }
-function copyToClipboard(s) {
+function copyToClipboard(el, s) {
+	showHoverInfo(el, 'Copied!');
 	navigator.clipboard.writeText(s);
 }
 function showTeleportInfo(el, location) {
