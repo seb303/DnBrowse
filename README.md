@@ -47,7 +47,9 @@ All types of note can be browsed: locations, cuboids, ellipsoids, polygons and i
 
 ### Search / Filter
 
-A search function allows searching of the data within the current tab. Since player flags are loaded on demand when each player is expanded in the tree view, only loaded players will be searched. The search can either expand and highlight all matches, or filter the tree so only matches are shown.
+A search function allows searching of the data within the current tab. Since player flags are loaded on demand when each player is expanded in the tree view, only loaded players will be searched.
+
+The search can either expand and highlight all matches, or filter the tree so only matches are shown.
 
 ### Player objects
 
