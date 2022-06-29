@@ -7,6 +7,7 @@ var options = {};
 function init() {
 	$.jstree.defaults.core.themes.variant = "dark";
 	$.jstree.defaults.plugins = [ "search", "state" ]; // "checkbox"
+	$.jstree.defaults.search.show_only_matches_children = true;
 	secret = window.location.pathname.substring(1);
 	var jqxhr = $.getJSON( '/ajax', {secret: secret, action: 'get_options'}, function(data) {
 		setInterval(function() {
@@ -27,14 +28,53 @@ function init() {
 	.fail(function() {
 		alert('An error occurred:\n\n'+jqxhr.responseText);
 	});
-	$("#search").submit(function(e) {
-		e.preventDefault();
-		$('#data_'+current_tab).jstree(true).search($('#query').val());
+	
+	$('#searchtype img').on('click', function(e) {
+		if (!query_menu) {
+			e.stopImmediatePropagation();
+			$('#searchtype').addClass('menu').removeClass('filter');
+			query_menu = true;
+		}
 	});
+	$('#searchtype img.search').on('click', function(e) {
+		if (query_menu) {
+			e.stopImmediatePropagation();
+			$('#searchtype').removeClass(['menu','filter']);
+			query_menu = false;
+			query_filter = false;
+			doSearch();
+		}
+	});
+	$('#searchtype img.filter').on('click', function(e) {
+		if (query_menu) {
+			e.stopImmediatePropagation();
+			$('#searchtype').removeClass('menu').addClass('filter');
+			query_menu = false;
+			query_filter = true;
+			doSearch();
+		}
+	});
+	$('#search').submit(function(e) {
+		e.preventDefault();
+		doSearch();
+	});
+}
+var query_menu = false;
+var query_filter = false;
+var query_per_tab = {};
+function doSearch() {
+	query_per_tab[current_tab] = {
+		query: $('#query').val(),
+		filter: query_filter
+	}
+	$('#data_'+current_tab).jstree(true).search(query_per_tab[current_tab].query, false, query_per_tab[current_tab].filter);
 }
 
 var current_tab, players_list;
 function switchTab(tab) {
+	if (tab == current_tab) {
+		return;
+	}
 	$('#tabs > span').removeClass('active');
 	$('#tab_'+tab).addClass('active');
 	if ($('#data_'+tab).length == 0) {
@@ -129,6 +169,21 @@ function switchTab(tab) {
 	$('#data_'+tab).addClass('active');
 	current_tab = tab;
 	window.location.hash = '#'+tab;
+	
+	$('#searchtype').removeClass('menu');
+	query_menu = false;
+	if (query_per_tab[current_tab]) {
+		$('#query').val(query_per_tab[current_tab].query);
+		query_filter = query_per_tab[current_tab].filter;
+	} else {
+		$('#query').val('');
+		query_filter = false;
+	}
+	if (query_filter) {
+		$('#searchtype').addClass('filter');
+	} else {
+		$('#searchtype').removeClass('filter');
+	}
 }
 function loadPlayerFlags(node, cb) {
 	if (node.parent === null) {
@@ -250,7 +305,6 @@ function notesRootNode(notes) {
 				children: notesTreeNode(notes[notetype], notetype),
 				li_attr: {class:'notetype'}
 			};
-			console.log(notes[notetype]);
 		}
 	}
 	return node;
@@ -331,9 +385,6 @@ function notesTreeSubNode(key, value) {
 					text: subkey+' <span class=equals>=</span> <span class=value>'+escapeHtml(value[subkey], true)+'</span>'
 				};
 			} else {
-				if (key == 'flags') {
-					console.log(value);
-				}
 				if (key == 'slots') {
 					var subkey_label = '<span class=value>'+subkey+' <span class=equals>=</span> '+escapeHtml(value[subkey].name);
 					delete value[subkey].name;
