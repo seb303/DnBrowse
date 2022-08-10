@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v1.0.0 2022-07-01                                   ##
+## v1.0.2 2022-08-10                                   ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
@@ -255,6 +255,9 @@ dnbrowse_events:
             - determine headers:[Content-Type=text/plain] passively
             - determine "raw_text_content:Permission denied"
 
+        on server prestart:
+            - flag server dnbrowse_active:!
+            - flag server dnbrowse_secret:!
 
 dnbrowse_command:
     type: command
@@ -294,7 +297,8 @@ dnbrowse_command:
         # Ensure webserver is running
         - if !<server.has_flag[dnbrowse_active]>:
             - flag server dnbrowse_active
-            - webserver start port:<script[dnbrowse_config].data_key[port]> ignore_errors
+            ## Add back ignore_errors ?
+            - webserver start port:<script[dnbrowse_config].data_key[port]>
 
         # Output link
         - define url <[url]>/<[dnbrowse_secret]>
