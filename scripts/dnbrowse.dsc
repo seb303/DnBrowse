@@ -297,8 +297,7 @@ dnbrowse_command:
         # Ensure webserver is running
         - if !<server.has_flag[dnbrowse_active]>:
             - flag server dnbrowse_active
-            ## Add back ignore_errors ?
-            - webserver start port:<script[dnbrowse_config].data_key[port]>
+            - webserver start port:<script[dnbrowse_config].data_key[port]> ignore_errors
 
         # Output link
         - define url <[url]>/<[dnbrowse_secret]>
