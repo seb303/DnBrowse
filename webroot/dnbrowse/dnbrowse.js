@@ -226,10 +226,7 @@ function flagTreeNode(flags) {
 		if (flags.constructor === Array) {
 			for (var i=0; i < flags.length; i++) {
 				if (typeof flags[i] != 'object') {
-					node[node.length] = {
-						text: nodeValue(flags[i]),
-						li_attr: {class:'value'}
-					};
+					node[node.length] = nodeValue(flags[i]);
 				} else {
 					node[node.length] = {
 						text: ''+(i+1),
