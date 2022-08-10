@@ -1,7 +1,7 @@
 ## ====================================================##
 ## Creates an HTML interface to browse Flags and Notes ##
 ## by @seb303                                          ##
-## v1.0.2 2022-08-10                                   ##
+## v1.0.3 2022-08-10                                   ##
 ## Requires Denizen-1.2.5-b6309-DEV or newer           ##  https://ci.citizensnpcs.co/job/Denizen_Developmental/
 ## ====================================================##
 
@@ -176,7 +176,7 @@ dnbrowse_events:
                         - foreach locations|cuboids|ellipsoids|polygons|inventories as:type:
                             - foreach <server.notes[<[type]>]> as:note:
                                 - define data.<[type]>.<[note]>.name <[note].note_name>
-                                - if <[note].flag_map.exists> &&  <[note].flag_map.size> > 0:
+                                - if <[note].flag_map.exists> && <[note].flag_map.size> > 0:
                                     - define data.<[type]>.<[note]>.flags:<[note].flag_map>
                                 - choose <[type]>:
                                     - case locations:
