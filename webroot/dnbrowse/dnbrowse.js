@@ -216,16 +216,27 @@ function loadPlayerFlags(node, cb) {
 }
 
 function flagTreeNode(flags) {
+	if (flags.__value) {
+		flags = flags.__value;
+	}
 	var node = [];
-	if (flags.__value && typeof flags.__value != 'object') {
-		node[node.length] = nodeValue(flags.__value);
+	if (flags && typeof flags != 'object') {
+		node[node.length] = nodeValue(flags);
 	} else {
-		if (flags.__value) {
-			flags = flags.__value;
-		}
 		if (flags.constructor === Array) {
 			for (var i=0; i < flags.length; i++) {
-				node[node.length] = nodeValue(flags[i]);
+				if (typeof flags[i] != 'object') {
+					node[node.length] = {
+						text: nodeValue(flags[i]),
+						li_attr: {class:'value'}
+					};
+				} else {
+					node[node.length] = {
+						text: ''+(i+1),
+						children: flagTreeNode(flags[i]),
+						li_attr: {class:'key'}
+					};
+				}
 			}
 		} else {
 			var keys = Object.keys(flags).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
@@ -263,6 +274,9 @@ function flagNodeElement(key, value) {
 	return false;
 }
 function nodeValue(value) {
+	if (typeof value !== 'string') {
+		value = value.toString()+' - this is probably an error, please open a github issue';
+	}
 	var text = escapeHtml(value);
 	if (value.startsWith('p@')) {
 		var uuid = value.substring(2);
