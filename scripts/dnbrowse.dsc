@@ -174,7 +174,7 @@ dnbrowse_events:
                     - case load_notes:
                         - define data <map>
                         - foreach locations|cuboids|ellipsoids|polygons|inventories as:type:
-                            - foreach <server.notes[<[type]>]> as:note:
+                            - foreach <util.notes[<[type]>]> as:note:
                                 - define data.<[type]>.<[note]>.name <[note].note_name>
                                 - if <[note].flag_map.exists> && <[note].flag_map.size> > 0:
                                     - define data.<[type]>.<[note]>.flags:<[note].flag_map>
